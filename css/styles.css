@@ -1,0 +1,11 @@
+.hidden {
+  display: none;
+}
+
+.error-text {
+  color: orangered;
+  font-weight: bold;
+  padding: 1rem;
+  background-color: gray;
+  border-radius: 4px;
+}

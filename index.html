@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Security Header Analyzer</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <script src="js/api.js" defer></script>
+    <script src="js/app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Analisador de Headers de Segurança</h1>
+      <p>
+        O intuito dessa ferramenta é auxiliar no mapeamento da superfície de
+        defesa de aplicações web.
+      </p>
+    </header>
+    <main>
+      <section class="target-control">
+        <input
+          type="url"
+          id="urlInput"
+          placeholder="Digite a URL aqui"
+          required
+        />
+        <button id="analyzeBtn">Auditar alvo</button>
+      </section>
+
+      <div id="loadingIndicator" class="hidden">
+        <p>Analisando a resposta do servidor...</p>
+      </div>
+
+      <div id="errorMessage" class="error-text-hidden"></div>
+
+      <section id="reportArea" class="hidden">
+        <div class="present-column">
+          <h2>Headers presentes</h2>
+          <p>Cabeçalhos detectados na resposta do servidor:</p>
+          <pre id="presentBox"></pre>
+        </div>
+
+        <div class="missing-column">
+          <h2>Headers ausentes</h2>
+          <p>Cabeçalhos que não foram encontrados:</p>
+          <ul id="missingList"></ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
