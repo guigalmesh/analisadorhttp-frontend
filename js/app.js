@@ -31,16 +31,28 @@ async function handleAnalysis() {
 }
 
 function renderReport(data) {
-  presentBox.textContent = JSON.stringify(data.present, null, 2);
-
+  presentBox.textContent = "";
   missingList.innerHTML = "";
 
-  for (const header of data.missing) {
+  const reports = data.results;
+
+  const secures = reports.filter((item) => item.status === "Secure");
+  const vulnerables = reports.filter((item) => item.status !== "Secure");
+
+  presentBox.textContent = JSON.stringify(secures, null, 2);
+
+  for (const item of vulnerables) {
     const li = document.createElement("li");
-    li.textContent = header;
+
+    li.textContent = `[${item.severity}] ${item.headerName} (${item.status}): ${item.vulnerability}`;
+
+    if (item.severity === "Critical") {
+      li.style.color = "#dc3545";
+      li.style.fontWeight = "bold";
+    }
+
     missingList.appendChild(li);
   }
-
   reportArea.classList.remove("hidden");
 }
 

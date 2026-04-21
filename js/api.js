@@ -18,8 +18,8 @@ async function fetchSecurityReport(targetUrl) {
     const data = await response.json();
 
     if (!response.ok) {
-      const errorMessage = data.erro
-        ? `${data.erro}: ${data.detalhes}`
+      const errorMessage = data.error
+        ? `${data.error}: ${data.details}`
         : "Failed to communicate with the target.";
       throw new Error(errorMessage);
     }
