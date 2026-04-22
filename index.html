@@ -7,12 +7,19 @@
 
     <link rel="stylesheet" href="css/styles.css" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,900;1,900&display=swap"
+      rel="stylesheet"
+    />
+
     <script src="js/api.js" defer></script>
     <script src="js/app.js" defer></script>
   </head>
   <body>
     <header>
-      <h1>Analisador de Headers de Segurança</h1>
+      <h1>ANALISADOR DE HEADERS DE SEGURANÇA</h1>
       <p>
         O intuito dessa ferramenta é auxiliar no mapeamento da superfície de
         defesa de aplicações web.
@@ -36,17 +43,9 @@
       <div id="errorMessage" class="error-text hidden"></div>
 
       <section id="reportArea" class="hidden">
-        <div class="present-column">
-          <h2>Headers presentes</h2>
-          <p>Cabeçalhos detectados na resposta do servidor:</p>
-          <pre id="presentBox"></pre>
-        </div>
+        <h2>Report</h2>
 
-        <div class="missing-column">
-          <h2>Headers ausentes</h2>
-          <p>Cabeçalhos que não foram encontrados:</p>
-          <ul id="missingList"></ul>
-        </div>
+        <div id="cardsContainer" class="cards-grid"></div>
       </section>
     </main>
   </body>

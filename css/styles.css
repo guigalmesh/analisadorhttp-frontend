@@ -1,11 +1,105 @@
+/* Color Palette Inspired by git-scm.com */
+:root {
+  /* Backgrounds */
+  --bg-main: #222222; /* The main page background - a dark, warm gray */
+  --bg-card: #333333; /* Background for report cards, code boxes - slightly lighter */
+
+  /* Texts */
+  --text-main: #ffffff; /* Main body text - pure white */
+  --text-muted: #a0a0a0; /* Secondary, less important text - medium gray */
+
+  /* Accents & Active States */
+  --accent: #f05032; /* The Git orange for titles, buttons, and links */
+
+  /* UI Elements */
+  --border: #444444; /* Subtle dividers, inputs borders, and section edges */
+  --shadow: rgba(0, 0, 0, 0.3); /* Subtle shadow for depth on cards */
+}
+
 .hidden {
   display: none;
 }
 
-.error-text {
-  color: orangered;
+.cards-grid {
+  display: grid;
+  /* Isso cria colunas automáticas. Se tiver espaço, ficam lado a lado. Se for celular, ficam em uma coluna só. */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.card {
+  background-color: var(--bg-card); /* Fundo do card */
+  box-shadow: 0 4px 8px 0 var(--shadow); /* Sombra transparente */
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  border-left: 5px solid var(--border); /* Uma borda colorida lateral para dar estilo */
+  color: var(--text-muted);
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px 0 var(--shadow);
+  transform: translateY(-5px);
+}
+
+.card-title {
+  color: var(--accent);
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.card-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
   font-weight: bold;
-  padding: 1rem;
-  background-color: darkslategray;
-  border-radius: 4px;
+  color: var(
+    --bg-main
+  ); /* Texto escuro para contrastar com o fundo colorido da tag */
+  margin-bottom: 1rem;
+}
+
+.status-secure {
+  background-color: #2ea043;
+} /* Verde */
+.status-vulnerable {
+  background-color: #f85149;
+} /* Vermelho */
+.status-missing {
+  background-color: #d29922;
+} /* Amarelo */
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-muted); /* Main text gets a slightly muted gray */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 2rem;
+}
+
+/* Use the accent color for all main headings, just like the Git site */
+h1,
+h2 {
+  color: var(--accent);
+}
+
+/* The analyzer button uses the accent orange */
+#analyzeBtn {
+  background-color: var(--accent);
+  color: var(--text-main);
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+/* The input gets a clean dark border */
+#urlInput {
+  background-color: var(--text-main);
+  border: 2px solid var(--border);
+  padding: 0.5rem;
 }

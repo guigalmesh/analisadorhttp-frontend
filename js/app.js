@@ -31,29 +31,47 @@ async function handleAnalysis() {
 }
 
 function renderReport(data) {
-  presentBox.textContent = "";
-  missingList.innerHTML = "";
+  // 1. Aponta para o contêiner vazio no HTML
+  const cardsContainer = document.getElementById("cardsContainer");
+  cardsContainer.innerHTML = ""; // Limpa resultados anteriores
 
-  const reports = data.results;
+  // 2. Loop através de cada cabeçalho retornado pelo Haskell
+  data.results.forEach((item) => {
+    // Cria a 'div' do card em branco
+    const card = document.createElement("div");
+    card.className = "card";
 
-  const secures = reports.filter((item) => item.status === "Secure");
-  const vulnerables = reports.filter((item) => item.status !== "Secure");
-
-  presentBox.textContent = JSON.stringify(secures, null, 2);
-
-  for (const item of vulnerables) {
-    const li = document.createElement("li");
-
-    li.textContent = `[${item.severity}] ${item.headerName} (${item.status}): ${item.vulnerability}`;
-
-    if (item.severity === "Critical") {
-      li.style.color = "#dc3545";
-      li.style.fontWeight = "bold";
+    // Lógica de Cores: Define a classe do "Badge" e a cor da borda baseado no Status
+    let badgeClass = "";
+    if (item.status === "Secure") {
+      badgeClass = "status-secure";
+      card.style.borderLeftColor = "#2ea043"; // Borda verde
+    } else if (item.status === "Vulnerable") {
+      badgeClass = "status-vulnerable";
+      card.style.borderLeftColor = "#f85149"; // Borda vermelha
+    } else {
+      badgeClass = "status-missing";
+      card.style.borderLeftColor = "#d29922"; // Borda amarela
     }
 
-    missingList.appendChild(li);
-  }
-  reportArea.classList.remove("hidden");
+    // 3. Injeta as informações cruas do JSON formatadas dentro do HTML do card
+    // Usamos Template Literals (as crases) para misturar HTML com variáveis facilmente
+    card.innerHTML = `
+            <h3 class="card-title">${item.headerName}</h3>
+            <span class="card-badge ${badgeClass}">${item.status}</span>
+
+            <p><strong>Severity:</strong> ${item.severity}</p>
+            <p><strong>Description:</strong> ${item.description}</p>
+            <p><strong>Vulnerability:</strong> ${item.vulnerability}</p>
+            <p><strong>Value:</strong> <code>${item.foundValue || "Not Found"}</code></p>
+        `;
+
+    // 4. Adiciona o card finalizado dentro do contêiner
+    cardsContainer.appendChild(card);
+  });
+
+  // Exibe a área do relatório que estava escondida
+  document.getElementById("reportArea").classList.remove("hidden");
 }
 
 function showError(message) {
