@@ -24,6 +24,15 @@
         O intuito dessa ferramenta é auxiliar no mapeamento da superfície de
         defesa de aplicações web.
       </p>
+      <p>
+        Em uma aplicação moderna, a presença ou ausência de um cabeçalho de
+        segurança não indica necessariamente que exista uma vulnerabilidade
+        explorável, pois outras camadas de proteção podem estar ativas.
+      </p>
+      <p>
+        Use o relatório feito apenas como ferramenta de reconhecimento e higiene
+        de configuração, e não como um veredito final.
+      </p>
     </header>
     <main>
       <section class="target-control">
@@ -41,6 +50,27 @@
       </div>
 
       <div id="errorMessage" class="error-text hidden"></div>
+
+      <section>
+        <div id="filterContainer" class="hidden">
+          <span id="filterSpan">Filtros:</span>
+
+          <label class="checkbox-label">
+            <input type="checkbox" class="filter-checkbox" value="critical" />
+            Críticos
+          </label>
+
+          <label class="checkbox-label">
+            <input type="checkbox" class="filter-checkbox" value="vulnerable" />
+            Vulneráveis / Ausentes
+          </label>
+
+          <label class="checkbox-label">
+            <input type="checkbox" class="filter-checkbox" value="secure" />
+            Seguros
+          </label>
+        </div>
+      </section>
 
       <section id="reportArea" class="hidden">
         <h2>Report</h2>
