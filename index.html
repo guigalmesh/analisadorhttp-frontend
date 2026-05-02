@@ -14,6 +14,11 @@
   </head>
   <body>
     <header>
+      <nav class="navBar">
+        <button id="navScannerBtn" class="active">Scanner</button>
+        <button id="navHistoryBtn">Histórico</button>
+      </nav>
+
       <h1>ANALISADOR DE HEADERS DE SEGURANÇA</h1>
       <p>
         O intuito dessa ferramenta é auxiliar no mapeamento da superfície de
@@ -30,47 +35,65 @@
       </p>
     </header>
     <main>
-      <section class="target-control">
-        <input
-          type="url"
-          id="urlInput"
-          placeholder="Digite a URL aqui"
-          required
-        />
-        <button id="analyzeBtn">Auditar alvo</button>
-      </section>
-
-      <div id="loadingIndicator" class="hidden">
-        <p>Analisando a resposta do servidor...</p>
-      </div>
-
-      <div id="errorMessage" class="error-text hidden"></div>
-
-      <section>
-        <div id="filterContainer" class="hidden">
-          <span id="filterSpan">Filtros:</span>
-
+      <section id="scannerSection">
+        <section class="target-control">
+          <input
+            type="url"
+            id="urlInput"
+            placeholder="Digite a URL aqui"
+            required
+          />
+          <button id="analyzeBtn">Auditar alvo</button>
           <label class="checkbox-label">
-            <input type="checkbox" class="filter-checkbox" value="critical" />
-            Críticos
+            <input id="saveHistoryCheck" type="checkbox" /> Salvar no Histórico
           </label>
+        </section>
 
-          <label class="checkbox-label">
-            <input type="checkbox" class="filter-checkbox" value="vulnerable" />
-            Vulneráveis / Ausentes
-          </label>
-
-          <label class="checkbox-label">
-            <input type="checkbox" class="filter-checkbox" value="secure" />
-            Seguros
-          </label>
+        <div id="loadingIndicator" class="hidden">
+          <p>Analisando a resposta do servidor...</p>
         </div>
+
+        <div id="errorMessage" class="error-text hidden"></div>
+
+        <section>
+          <div id="filterContainer" class="hidden">
+            <span id="filterSpan">Filtros:</span>
+
+            <label class="checkbox-label">
+              <input type="checkbox" class="filter-checkbox" value="critical" />
+              Críticos
+            </label>
+
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                class="filter-checkbox"
+                value="vulnerable"
+              />
+              Vulneráveis / Ausentes
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" class="filter-checkbox" value="secure" />
+              Seguros
+            </label>
+          </div>
+        </section>
+
+        <section id="reportArea" class="hidden">
+          <h2>Report</h2>
+
+          <div id="cardsContainer" class="cards-grid"></div>
+        </section>
       </section>
 
-      <section id="reportArea" class="hidden">
-        <h2>Report</h2>
+      <section id="historySection" class="hidden">
+        <h2>Histórico de Análises</h2>
+        <p>Últimos sites auditados pela ferramenta:</p>
 
-        <div id="cardsContainer" class="cards-grid"></div>
+        <div id="historyContainer" style="margin-top: 20px">
+          <p>Carregando histórico...</p>
+        </div>
       </section>
     </main>
   </body>

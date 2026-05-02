@@ -31,3 +31,30 @@ async function fetchSecurityReport(targetUrl) {
     throw error;
   }
 }
+
+async function saveHistory(url, reportData) {
+  const response = await fetch("http://localhost:3000/api/history", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      scannedURL: url,
+      report: JSON.stringify(reportData),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Falha ao salvar no banco de dados.");
+  }
+
+  return response.text();
+}
+
+async function getHistory() {
+  const response = await fetch("http://localhost:3000/api/history");
+
+  if (!response.ok) {
+    throw new Error("Falha ao buscar o histórico.");
+  }
+
+  return response.json();
+}

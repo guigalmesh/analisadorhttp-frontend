@@ -5,10 +5,25 @@ const errorMessage = document.getElementById("errorMessage");
 const reportArea = document.getElementById("reportArea");
 const presentBox = document.getElementById("presentBox");
 const missingList = document.getElementById("missingList");
+const scannerSection = document.getElementById("scannerSection");
+const historySection = document.getElementById("historySection");
+const navScannerBtn = document.getElementById("navScannerBtn");
+const navHistoryBtn = document.getElementById("navHistoryBtn");
 
 let currentReportData = [];
 
 analyzeBtn.addEventListener("click", handleAnalysis);
+navScannerBtn.addEventListener("click", () => {
+  scannerSection.classList.remove("hidden");
+  historySection.classList.add("hidden");
+});
+
+navHistoryBtn.addEventListener("click", () => {
+  scannerSection.classList.add("hidden");
+  historySection.classList.remove("hidden");
+
+  loadHistory();
+});
 
 async function handleAnalysis() {
   let targetUrl = urlInput.value.trim();
@@ -34,6 +49,13 @@ async function handleAnalysis() {
     currentReportData = reportData.results;
 
     document.getElementById("filterContainer").classList.remove("hidden");
+
+    const shouldSave = document.getElementById("saveHistoryCheck").checked;
+
+    if (shouldSave) {
+      await saveHistory(targetUrl, currentReportData);
+      console.log("Análise salva no histórico!");
+    }
 
     renderReport(currentReportData);
   } catch (error) {
@@ -124,6 +146,61 @@ function applyFilters() {
 
   // 4. Limpa a tela e renderiza o novo resultado combinado
   renderReport(filteredData);
+}
+
+async function loadHistory() {
+  const historyContainer = document.getElementById("historyContainer");
+
+  // Feedback visual inicial enquanto o banco de dados responde
+  historyContainer.innerHTML = "<p>Buscando registros no banco de dados...</p>";
+
+  try {
+    // 1. Chama a função limpa que criamos no api.js
+    const data = await getHistory();
+
+    // 2. Trata o caso do banco estar vazio
+    if (data.length === 0) {
+      historyContainer.innerHTML =
+        "<p>Nenhuma análise salva no histórico ainda.</p>";
+      return;
+    }
+
+    // 3. Monta o HTML dinâmico com os cards de histórico
+    let html = '<ul style="list-style: none; padding: 0;">';
+
+    data.forEach((item) => {
+      const url = item[0];
+      const rawDate = item[1];
+
+      // Formata a data e hora para o padrão legível no Brasil
+      const formattedDate = new Date(rawDate).toLocaleString("pt-BR");
+
+      // Criação do "mini-card" com estilos inline integrados
+      html += `
+        <li style="padding: 15px; margin-bottom: 10px; background-color: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: #24292f; font-size: 1.1em;">🛡️ ${url}</strong>
+            </div>
+            <div style="color: #57606a; font-size: 0.9em;">
+              Analisado em: <strong>${formattedDate}</strong>
+            </div>
+        </li>
+      `;
+    });
+
+    html += "</ul>";
+
+    // 4. Injeta a lista finalizada na tela
+    historyContainer.innerHTML = html;
+  } catch (error) {
+    // Caso o Haskell esteja desligado ou o banco SQLite bloqueado
+    console.error("Erro ao carregar histórico:", error);
+    historyContainer.innerHTML = `
+      <p style="color: #f85149; font-weight: bold;">
+        Erro de comunicação com o banco de dados. Verifique se o servidor Haskell está rodando.
+      </p>
+    `;
+  }
 }
 
 // Adiciona o ouvinte de eventos para disparar a filtragem sempre que o usuário marcar/desmarcar
