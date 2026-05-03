@@ -59,3 +59,13 @@ async function getHistory() {
 
   return response.json();
 }
+
+async function getRanking() {
+  const response = await fetch("http://localhost:3000/api/ranking");
+
+  if (!response.ok) {
+    throw new Error("Falha ao buscar o ranking.");
+  }
+
+  return response.json();
+}

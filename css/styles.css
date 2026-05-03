@@ -211,3 +211,48 @@ p {
 .value-box::-webkit-scrollbar-thumb:hover {
   background-color: var(--accent);
 }
+
+/* =========================================
+   RANKING LEADERBOARD
+   ========================================= */
+.ranking-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-card);
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease;
+}
+
+.ranking-item:hover {
+  transform: scale(1.02);
+  border-color: var(--accent);
+}
+
+.ranking-grade {
+  font-size: 1.8em;
+  font-weight: bold;
+  width: 50px;
+  text-align: center;
+  margin-right: 20px;
+}
+
+.ranking-info {
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ranking-url {
+  font-size: 1.2em;
+  color: var(--text-main);
+  font-weight: bold;
+}
+
+.ranking-date {
+  color: var(--text-muted);
+  font-size: 0.9em;
+}

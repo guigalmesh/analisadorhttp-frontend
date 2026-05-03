@@ -9,26 +9,39 @@ const scannerSection = document.getElementById("scannerSection");
 const historySection = document.getElementById("historySection");
 const navScannerBtn = document.getElementById("navScannerBtn");
 const navHistoryBtn = document.getElementById("navHistoryBtn");
+const navRankingBtn = document.getElementById("navRankingBtn");
 
 let currentReportData = [];
 
-analyzeBtn.addEventListener("click", handleAnalysis);
-navScannerBtn.addEventListener("click", () => {
-  scannerSection.classList.remove("hidden");
-  historySection.classList.add("hidden");
+const scanArea = document.getElementById("scannerSection");
+const historyArea = document.getElementById("historySection");
+const rankingArea = document.getElementById("rankingSection");
 
-  navScannerBtn.classList.add("active");
-  navHistoryBtn.classList.remove("active");
+analyzeBtn.addEventListener("click", handleAnalysis);
+
+function switchTab(activeBtn, activeArea) {
+    [navScannerBtn, navHistoryBtn, navRankingBtn].forEach(btn => btn.classList.remove("active"));
+
+    // 2. MUDE AQUI: Coloque rankingSection no array de esconder
+    [scanArea, historyArea, rankingArea].forEach(area => area.classList.add("hidden"));
+
+    activeBtn.classList.add("active");
+    activeArea.classList.remove("hidden");
+}
+
+navScannerBtn.addEventListener("click", () => {
+  switchTab(navScannerBtn, scanArea);
 });
 
 navHistoryBtn.addEventListener("click", () => {
-  scannerSection.classList.add("hidden");
-  historySection.classList.remove("hidden");
-
-  navHistoryBtn.classList.add("active");
-  navScannerBtn.classList.remove("active");
+  switchTab(navHistoryBtn, historyArea);
   loadHistory();
 });
+
+navRankingBtn.addEventListener("click", () => {
+  switchTab(navRankingBtn, rankingArea);
+  loadRanking();
+})
 
 async function handleAnalysis() {
   let targetUrl = urlInput.value.trim();
@@ -309,6 +322,58 @@ function calculateGradeAndSummary(reportData) {
   else if (score < 90) grade = "B";
 
   return { grade, summary: summaryParts.join(", ") };
+}
+
+async function loadRanking() {
+  const container = document.getElementById("rankingContainer");
+
+  // Mostra estado de carregamento
+  container.innerHTML = '<p style="text-align:center; color: var(--text-muted);">Carregando leaderboard...</p>';
+
+  try {
+    // 1. Pede os dados para o api.js
+    const data = await getRanking();
+
+    // Limpa o texto de carregamento
+    container.innerHTML = "";
+
+    // 2. Se o banco estiver vazio
+    if (data.length === 0) {
+      container.innerHTML = '<p style="text-align:center; color: var(--text-muted);">Nenhum site escaneado ainda. Seja o primeiro!</p>';
+      return;
+    }
+
+    // 3. Monta os cards na tela
+    data.forEach((item) => {
+      const url = item[0];
+      const grade = item[1];
+      const dateStr = item[2];
+
+      const formattedDate = new Date(dateStr).toLocaleString("pt-BR");
+
+      // Define a cor da nota
+      let gradeColor = "#2ea043"; // A, B
+      if (grade === "C" || grade === "D") gradeColor = "#d29922"; // Amarelo
+      if (grade === "F") gradeColor = "#f85149"; // Vermelho
+
+      const li = document.createElement("li");
+      li.className = "ranking-item";
+
+      li.innerHTML = `
+        <div class="ranking-grade" style="color: ${gradeColor};">${grade}</div>
+        <div class="ranking-info">
+          <span class="ranking-url" style="color: var(--text-main); font-weight: bold;">${url}</span>
+          <span class="ranking-date" style="color: var(--text-muted); font-size: 0.9em;">Último scan: ${formattedDate}</span>
+        </div>
+      `;
+
+      container.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error("Erro ao carregar o ranking:", error);
+    container.innerHTML = '<p style="text-align:center; color: #f85149;">Erro ao conectar com o servidor Haskell. Verifique se a API está rodando.</p>';
+  }
 }
 
 // Adiciona o ouvinte de eventos para disparar a filtragem sempre que o usuário marcar/desmarcar
