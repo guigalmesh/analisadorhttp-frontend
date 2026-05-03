@@ -53,7 +53,8 @@ async function handleAnalysis() {
     const shouldSave = document.getElementById("saveHistoryCheck").checked;
 
     if (shouldSave) {
-      await saveHistory(targetUrl, currentReportData);
+      const analysis = calculateGradeAndSummary(currentReportData);
+      await saveHistory(targetUrl, analysis.grade, analysis.summary);
       console.log("Análise salva no histórico!");
     }
 
@@ -150,57 +151,155 @@ function applyFilters() {
 
 async function loadHistory() {
   const historyContainer = document.getElementById("historyContainer");
-
-  // Feedback visual inicial enquanto o banco de dados responde
   historyContainer.innerHTML = "<p>Buscando registros no banco de dados...</p>";
 
   try {
-    // 1. Chama a função limpa que criamos no api.js
     const data = await getHistory();
 
-    // 2. Trata o caso do banco estar vazio
+    // DEBUG: Descomente a linha abaixo para ver no console o que o Haskell está enviando
+    // console.log("Dados recebidos do Haskell:", data);
+
     if (data.length === 0) {
       historyContainer.innerHTML =
         "<p>Nenhuma análise salva no histórico ainda.</p>";
       return;
     }
 
-    // 3. Monta o HTML dinâmico com os cards de histórico
     let html = '<ul style="list-style: none; padding: 0;">';
 
     data.forEach((item) => {
-      const url = item[0];
-      const rawDate = item[1];
+      // O Haskell devolve uma lista de itens. A ordem deve ser:
+      // item[0] = URL, item[1] = Data, item[2] = Nota, item[3] = Resumo
+      const url = item[0] || "URL desconhecida";
+      const rawDate = item[1] || "";
+      const grade = item[2] || "-";
+      const summary = item[3] || ""; // NÃO use JSON.parse aqui, agora é texto puro!
 
-      // Formata a data e hora para o padrão legível no Brasil
-      const formattedDate = new Date(rawDate).toLocaleString("pt-BR");
+      const formattedDate = rawDate
+        ? new Date(rawDate).toLocaleString("pt-BR")
+        : "Data inválida";
 
-      // Criação do "mini-card" com estilos inline integrados
+      // Cor da nota
+      const gradeColor = grade === "A" || grade === "B" ? "#2ea043" : "#f85149";
+
       html += `
-        <li style="padding: 15px; margin-bottom: 10px; background-color: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong style="color: #24292f; font-size: 1.1em;">🛡️ ${url}</strong>
+        <li style="padding: 15px; margin-bottom: 10px; background-color: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div>
+                    <span style="font-weight: bold; font-size: 1.2em; color: ${gradeColor}; margin-right: 10px;">${grade}</span>
+                    <strong style="color: #24292f;">${url}</strong>
+                </div>
+                <div style="color: #57606a; font-size: 0.85em;">${formattedDate}</div>
             </div>
-            <div style="color: #57606a; font-size: 0.9em;">
-              Analisado em: <strong>${formattedDate}</strong>
+            <div style="font-size: 0.9em; color: #555; background: #fff; padding: 8px; border-radius: 4px; border: 1px dashed #ccc;">
+                <strong>Resumo:</strong> ${summary}
             </div>
         </li>
       `;
     });
 
     html += "</ul>";
-
-    // 4. Injeta a lista finalizada na tela
     historyContainer.innerHTML = html;
   } catch (error) {
-    // Caso o Haskell esteja desligado ou o banco SQLite bloqueado
-    console.error("Erro ao carregar histórico:", error);
+    // Se o código cair aqui com um GET 200, o console dirá o motivo exato (ex: erro de índice ou tipo)
+    console.error("Erro interno no processamento do histórico:", error);
     historyContainer.innerHTML = `
-      <p style="color: #f85149; font-weight: bold;">
-        Erro de comunicação com o banco de dados. Verifique se o servidor Haskell está rodando.
+      <p style="color: #f85149;">
+        <strong>Erro ao processar dados:</strong> Verifique o console (F12) para detalhes técnicos.
       </p>
     `;
   }
+}
+
+function calculateGradeAndSummary(reportData) {
+  let score = 100;
+  let summaryParts = [];
+
+  const ignoredForGrading = [
+    "set-cookie",
+    "access-control-allow-origin",
+    "access-control-allow-credentials",
+    "access-control-allow-methods",
+    "access-control-allow-headers",
+    "cross-origin-embedder-policy",
+    "cross-origin-opener-policy",
+    "cross-origin-resource-policy",
+  ];
+
+  const leakyHeaders = [
+    "server",
+    "x-powered-by",
+    "x-aspnet-version",
+    "x-aspnetmvc-version",
+  ];
+
+  // 1. INTELIGÊNCIA DE CONTEXTO: O site possui um CSP Seguro?
+  const hasSecureCSP = reportData.some(
+    (item) =>
+      item.headerName.toLowerCase() === "content-security-policy" &&
+      item.status === "Secure",
+  );
+
+  reportData.forEach((item) => {
+    summaryParts.push(`${item.headerName}:${item.status}`);
+    const headerNameLower = item.headerName.toLowerCase();
+
+    if (ignoredForGrading.includes(headerNameLower)) return;
+
+    if (leakyHeaders.includes(headerNameLower) && item.status !== "Secure") {
+      score -= 2;
+      return;
+    }
+
+    if (headerNameLower === "x-frame-options" && hasSecureCSP) {
+      return;
+    }
+
+    if (headerNameLower === "x-xss-protection") {
+      if (item.status === "Missing" || item.value === "0") {
+        return;
+      }
+    }
+
+    if (item.status === "Missing" || item.status === "Vulnerable") {
+      // 2. A REGRA DE ANISTIA DO X-FRAME-OPTIONS
+      if (headerNameLower === "x-frame-options" && hasSecureCSP) {
+        // Como o CSP está presente e seguro, a ausência do XFO não é uma falha.
+        // Anistiamos a penalidade e pulamos para o próximo cabeçalho!
+        return;
+      }
+
+      // O seu switch original continua governando o resto
+      switch (item.severity) {
+        case "Critical":
+          score -= 20;
+          break;
+        case "Recommended":
+          // Diminuí de 5 para 3 para ser menos punitivo com adoções novas (Permissions-Policy)
+          score -= 3;
+          break;
+        case "Other":
+          score -= 0;
+          break;
+        default:
+          score -= 2;
+      }
+
+      if (item.status === "Vulnerable") {
+        score -= 5;
+      }
+    }
+  });
+
+  if (score < 0) score = 0;
+
+  let grade = "A";
+  if (score < 40) grade = "F";
+  else if (score < 60) grade = "D";
+  else if (score < 75) grade = "C";
+  else if (score < 90) grade = "B";
+
+  return { grade, summary: summaryParts.join(", ") };
 }
 
 // Adiciona o ouvinte de eventos para disparar a filtragem sempre que o usuário marcar/desmarcar

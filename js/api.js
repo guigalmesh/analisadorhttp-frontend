@@ -32,13 +32,14 @@ async function fetchSecurityReport(targetUrl) {
   }
 }
 
-async function saveHistory(url, reportData) {
+async function saveHistory(targetUrl, gradeValue, summaryValue) {
   const response = await fetch("http://localhost:3000/api/history", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      scannedURL: url,
-      report: JSON.stringify(reportData),
+      scannedURL: targetUrl,
+      grade: gradeValue,
+      summary: summaryValue,
     }),
   });
 
