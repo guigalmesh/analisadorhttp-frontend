@@ -3,8 +3,14 @@
  * @param {string} targetUrl - The URL to be analyzed.
  * @returns {Promise<Object>} - The JSON report from the server.
  */
+
+const API_BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://localhost:3000"
+    : "https://analisador-de-headerhttp.onrender.com";
+
 async function fetchSecurityReport(targetUrl) {
-  const apiEndpoint = "http://localhost:3000/analisador";
+  // Agora usa a variável dinâmica em vez do localhost fixo
+  const apiEndpoint = `${API_BASE_URL}/analisador`;
 
   try {
     const response = await fetch(apiEndpoint, {
@@ -27,13 +33,13 @@ async function fetchSecurityReport(targetUrl) {
     return data;
   } catch (error) {
     console.error("[API Error] Request failed:", error);
-
     throw error;
   }
 }
 
 async function saveHistory(targetUrl, gradeValue, summaryValue) {
-  const response = await fetch("http://localhost:3000/api/history", {
+  // Usando crases e ${API_BASE_URL}
+  const response = await fetch(`${API_BASE_URL}/api/history`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -51,7 +57,8 @@ async function saveHistory(targetUrl, gradeValue, summaryValue) {
 }
 
 async function getHistory() {
-  const response = await fetch("http://localhost:3000/api/history");
+  // Substituído o localhost
+  const response = await fetch(`${API_BASE_URL}/api/history`);
 
   if (!response.ok) {
     throw new Error("Falha ao buscar o histórico.");
@@ -61,7 +68,8 @@ async function getHistory() {
 }
 
 async function getRanking() {
-  const response = await fetch("http://localhost:3000/api/ranking");
+  // Substituído o localhost
+  const response = await fetch(`${API_BASE_URL}/api/ranking`);
 
   if (!response.ok) {
     throw new Error("Falha ao buscar o ranking.");
