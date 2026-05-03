@@ -136,5 +136,78 @@ p {
 }
 
 .navBar {
-  align-items: center;
+  display: flex;
+  justify-content: center; /* Centraliza os botões */
+  gap: 1rem;
+  background-color: var(--bg-card); /* Fundo um pouco mais claro que o body */
+  padding: 1rem 2rem 0 2rem; /* Sem padding embaixo para colar a borda */
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.nav-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  border-bottom: 3px solid transparent; /* Espaço invisível para a linha de tab */
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+  border-radius: 6px 6px 0 0; /* Arredonda só em cima */
+}
+
+.nav-btn:hover {
+  color: var(--text-main);
+  background-color: rgba(255, 255, 255, 0.05); /* Leve clareada no fundo */
+}
+
+.nav-btn.active {
+  color: var(--accent); /* Texto fica Laranja */
+  border-bottom: 3px solid var(--accent); /* Linha laranja embaixo */
+  background-color: transparent;
+}
+
+/* =========================================
+   CAIXA DE CÓDIGO (Para os valores dos cabeçalhos)
+   ========================================= */
+
+.value-box {
+  background-color: var(--bg-main); /* Fundo escuro */
+  color: var(--text-muted);
+  font-family: "Courier New", Courier, monospace; /* Fonte de código */
+  font-size: 0.85em;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  margin-top: 5px;
+
+  /* Impede que o texto empurre as paredes do card */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap; /* Garante que espaços em branco sejam respeitados, mas com quebra */
+
+  /* Limita a altura para não destruir o Grid de cards */
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* Scrollbar customizada idêntica a do histórico */
+.value-box::-webkit-scrollbar {
+  width: 6px;
+}
+.value-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.value-box::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 4px;
+}
+.value-box::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent);
 }

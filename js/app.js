@@ -16,12 +16,17 @@ analyzeBtn.addEventListener("click", handleAnalysis);
 navScannerBtn.addEventListener("click", () => {
   scannerSection.classList.remove("hidden");
   historySection.classList.add("hidden");
+
+  navScannerBtn.classList.add("active");
+  navHistoryBtn.classList.remove("active");
 });
 
 navHistoryBtn.addEventListener("click", () => {
   scannerSection.classList.add("hidden");
   historySection.classList.remove("hidden");
 
+  navHistoryBtn.classList.add("active");
+  navScannerBtn.classList.remove("active");
   loadHistory();
 });
 
@@ -96,12 +101,15 @@ function renderReport(dataArray) {
             <h3 class="card-title">${item.headerName}</h3>
             <span class="card-badge ${badgeClass}">${item.status}</span>
 
-            <p><strong>Severity:</strong> ${item.severity}</p>
-            <p><strong>Description:</strong> ${item.description}</p>
-            <p><strong>Vulnerability:</strong> ${item.vulnerability}</p>
-            <p><strong>Value:</strong> <code>${item.foundValue || "Not Found"}</code></p>
-        `;
+            <p style="margin-bottom: 8px;"><strong>Severity:</strong> ${item.severity}</p>
+            <p style="margin-bottom: 8px;"><strong>Description:</strong> ${item.description}</p>
+            <p style="margin-bottom: 12px;"><strong>Vulnerability:</strong> ${item.vulnerability}</p>
 
+            <div>
+                <strong>Value:</strong>
+                <div class="value-box">${item.foundValue || "Not Found"}</div>
+            </div>
+        `;
     // 4. Adiciona o card finalizado dentro do contêiner
     cardsContainer.appendChild(card);
   });
@@ -183,16 +191,17 @@ async function loadHistory() {
       const gradeColor = grade === "A" || grade === "B" ? "#2ea043" : "#f85149";
 
       html += `
-        <li style="padding: 15px; margin-bottom: 10px; background-color: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <li class="card" style="list-style: none; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div>
-                    <span style="font-weight: bold; font-size: 1.2em; color: ${gradeColor}; margin-right: 10px;">${grade}</span>
-                    <strong style="color: #24292f;">${url}</strong>
+                    <span style="font-weight: bold; font-size: 1.3em; color: ${gradeColor}; margin-right: 10px;">${grade}</span>
+                    <strong style="color: var(--text-main); font-size: 1.1em;">${url}</strong>
                 </div>
-                <div style="color: #57606a; font-size: 0.85em;">${formattedDate}</div>
+                <div style="color: var(--text-muted); font-size: 0.85em;">${formattedDate}</div>
             </div>
-            <div style="font-size: 0.9em; color: #555; background: #fff; padding: 8px; border-radius: 4px; border: 1px dashed #ccc;">
-                <strong>Resumo:</strong> ${summary}
+
+            <div style="font-size: 0.9em; color: var(--text-muted); background-color: var(--bg-main); padding: 10px; border-radius: 4px; border: 1px dashed var(--border);">
+                <strong style="color: var(--accent);">Resumo:</strong> ${summary}
             </div>
         </li>
       `;
